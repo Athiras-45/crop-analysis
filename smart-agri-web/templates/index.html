@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Agriculture Advisory System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <div class="site-header">
+      <div class="leaf">🌾</div>
+      <div>
+        <h1>Smart Agriculture Advisory System</h1>
+        <p>Enter your farm details to get a live weather, soil and satellite-based advisory report.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Farm Details</h2>
+      <p class="subtitle">All fields are required.</p>
+
+      {% if errors %}
+      <div class="error-box">
+        <strong>Please fix the following:</strong>
+        <ul>
+          {% for error in errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('analyze') }}">
+        <div class="grid">
+          <div class="field">
+            <label for="farm_name">Farm Name</label>
+            <input type="text" id="farm_name" name="farm_name" value="{{ form_data.get('farm_name', '') }}" placeholder="e.g. Green Valley Farm">
+          </div>
+
+          <div class="field">
+            <label for="farmer_name">Farmer Name</label>
+            <input type="text" id="farmer_name" name="farmer_name" value="{{ form_data.get('farmer_name', '') }}" placeholder="e.g. Ravi Kumar">
+          </div>
+
+          <div class="field">
+            <label for="crop">Crop</label>
+            <select id="crop" name="crop">
+              <option value="" {% if not form_data.get('crop') %}selected{% endif %} disabled>Select a crop</option>
+              {% for c in crops %}
+              <option value="{{ c }}" {% if form_data.get('crop') == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="soil_type">Soil Type</label>
+            <select id="soil_type" name="soil_type">
+              <option value="" {% if not form_data.get('soil_type') %}selected{% endif %} disabled>Select soil type</option>
+              {% for s in soils %}
+              <option value="{{ s }}" {% if form_data.get('soil_type') == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="latitude">Latitude</label>
+            <input type="text" id="latitude" name="latitude" value="{{ form_data.get('latitude', '') }}" placeholder="-90 to 90">
+          </div>
+
+          <div class="field">
+            <label for="longitude">Longitude</label>
+            <input type="text" id="longitude" name="longitude" value="{{ form_data.get('longitude', '') }}" placeholder="-180 to 180">
+          </div>
+
+          <div class="field full">
+            <label for="area">Farm Area (Acres)</label>
+            <input type="text" id="area" name="area" value="{{ form_data.get('area', '') }}" placeholder="e.g. 4.5">
+            <span class="hint">Must be greater than 0.</span>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button type="submit" class="primary">Generate Advisory Report →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

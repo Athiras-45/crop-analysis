@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Report | Smart Agriculture Advisory System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+{% macro badge(value) %}
+  {%- if value in ["Ideal", "Match", "Excellent", "Healthy"] -%}
+    <span class="badge good">{{ value }}</span>
+  {%- elif value in ["Higher than ideal", "Lower than ideal", "Moderate"] -%}
+    <span class="badge warn">{{ value }}</span>
+  {%- elif value in ["Mismatch", "Very Poor", "Poor"] -%}
+    <span class="badge bad">{{ value }}</span>
+  {%- elif value in ["Unavailable", "Unknown"] -%}
+    <span class="badge neutral">{{ value }}</span>
+  {%- else -%}
+    {{ value }}
+  {%- endif -%}
+{% endmacro %}
+
+  <div class="page">
+    <div class="site-header">
+      <div class="leaf">🌾</div>
+      <div>
+        <h1>Farm Advisory Report</h1>
+        <p>Generated from live weather, dataset averages{% if satellite_available %} and satellite imagery{% endif %}.</p>
+      </div>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-link">← Run another report</a>
+
+    {% if not satellite_available %}
+    <div class="satellite-note">
+      ⚠️ Satellite vegetation data could not be retrieved for this location (no recent cloud-free imagery, or the service is temporarily unavailable). The report below continues without it.
+    </div>
+    {% endif %}
+
+    <div class="results-grid">
+
+      <div class="card">
+        <div class="section-title">Farm Details</div>
+        <table class="data-table">
+          {% for key, value in farm_summary.items() %}
+          <tr><td class="param">{{ key }}</td><td class="value">{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Ideal Crop Conditions</div>
+        <table class="data-table">
+          {% for key, value in crop_data.items() %}
+          <tr><td class="param">{{ key }}</td><td class="value">{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Live Weather</div>
+        <table class="data-table">
+          {% for key, value in weather.items() %}
+          <tr><td class="param">{{ key }}</td><td class="value">{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      {% if satellite_available %}
+      <div class="card">
+        <div class="section-title">Satellite Vegetation Data</div>
+        <table class="data-table">
+          {% for key, value in satellite.items() %}
+          <tr><td class="param">{{ key }}</td><td class="value">{{ badge(value) }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="card">
+      <div class="section-title">Analysis</div>
+      <table class="data-table">
+        {% for key, value in analysis.items() %}
+        <tr><td class="param">{{ key }}</td><td class="value">{{ badge(value) }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Recommendations</div>
+      <ul class="rec-list">
+        {% for rec in recommendations %}
+        <li><span class="num">{{ loop.index }}.</span><span>{{ rec }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>
